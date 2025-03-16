@@ -11,7 +11,8 @@ const router = express.Router();
 
 const initWebRoutes = (app) => {
     router.get("/" , homeController.handleHelloWorld)
-    router.get("/user" , homeController.handleUserPage)
+    router.get("/user" , homeController.handleUserPage) //lấy từ server
+    router.post("/users/create-user" , homeController.handleCreateNewUser) //đẩy dữ liệu lên server
     return app.use("/" , router);
 }
 
