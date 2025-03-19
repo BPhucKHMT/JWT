@@ -1,14 +1,13 @@
 import bcrypt from 'bcryptjs'; // mã hóa mật khẩu
 const salt = bcrypt.genSaltSync(10); // tham số mã hóa mật khẩu
-// Get the client
-import mysql from'mysql2';
+// get the client
+import mysql from 'mysql2/promise';
 
-// Create the connection to database
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  database: 'jwt',
-});
+// get the promise implementation, we will use bluebird
+import bluebird from 'bluebird';
+
+// create the connection, specify bluebird as Promise
+
 
 
 const hashUserPassword = (userPassword)=>
@@ -17,36 +16,118 @@ const hashUserPassword = (userPassword)=>
     return hashPassword;
 }
 
-const createNewUser = (email , password , username)=>{
+const createNewUser = async (email , password , username)=>{
     let hashPass = hashUserPassword(password); // mã hóa password
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'jwt',
+        Promise: bluebird,
+      });
 
-
-    connection.query(
-        'INSERT INTO users (email , password , username) VALUES (? , ? ,?)',[email,hashPass,username],
-        function (err, results, fields) {
-                if(err)
-                {
-                    console.log(err);
-                }
-         }
-         );
+ 
+         try {
+            const [rows, fields] = await connection.execute(
+                'INSERT INTO users (email , password , username) VALUES (? , ? ,?)',[email,hashPass,username]
+               );
+             return rows; //trả về hàng dữ liệu
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
 }
 
-const getUserList = () => {
-    let users =[];
-    connection.query(
-        'SELECT * from users',
-            function (err, results, fields) {
-            if(err)
-            {
-                console.log(err);
+const getUserList = async() => {
+
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'jwt',
+        Promise: bluebird,
+      });
+
+
+    try {
+        const [rows, fields] = await connection.execute(
+            'SELECT * from users'
+           );
+         return rows; //trả về hàng dữ liệu
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+}
+
+const deleteUser = async (id) =>
+{
+    
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'jwt',
+        Promise: bluebird,
+      });
+
+        try {
+            const [rows, fields] = await connection.execute(
+                'DELETE FROM users WHERE id = ?',[id]
+               );
+             return rows; //trả về hàng dữ liệu
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+}
+    const getUserById = async (id) =>
+    {
+        const connection = await mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            database: 'jwt',
+            Promise: bluebird,
+          });
+    
+            try {
+                const [rows, fields] = await connection.execute(
+                    'SELECT * FROM users WHERE id = ?',[id]
+                   );
+                 return rows; //trả về hàng dữ liệu
             }
-            console.log("check result ", results );
-         }
-         );
-}
+            catch(error)
+            {
+                console.log(error);
+            }
+
+    }
+
+    const updateUserInfor = async (email ,username ,id)=> {
+    const connection = await mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: 'jwt',
+    Promise: bluebird,
+  });
+
+    try {
+        const [rows, fields] = await connection.execute(
+            'UPDATE users SET email = ? , username = ? WHERE id = ?',[email,username ,id]
+           );
+         return rows; //trả về hàng dữ liệu
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+    }
+
 
 module.exports = {
     createNewUser,
-    getUserList
+    getUserList,
+    deleteUser,
+    getUserById,
+    updateUserInfor
 }
