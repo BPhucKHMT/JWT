@@ -34,10 +34,11 @@ const handleUserPage =  async (req , res) =>
         let id =req.params.id;
         let user =await  userService.getUserById(id);
         let userData = {};
-        if(user && user.length >0)
-        {
-            userData = user[0];
-        }
+        userData = user;
+        // if(user && user.length >0)
+        // {
+        //     userData = user[0];
+        // }
         console.log(userData)
         return res.render("user-update.ejs" , {userData})
     }

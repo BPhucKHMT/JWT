@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'; // mã hóa mật khẩu
 const salt = bcrypt.genSaltSync(10); // tham số mã hóa mật khẩu
 // get the client
 import mysql from 'mysql2/promise';
+import db from '../models/index.js'
 
 // get the promise implementation, we will use bluebird
 import bluebird from 'bluebird';
@@ -18,19 +19,13 @@ const hashUserPassword = (userPassword)=>
 
 const createNewUser = async (email , password , username)=>{
     let hashPass = hashUserPassword(password); // mã hóa password
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: bluebird,
-      });
-
- 
+  
          try {
-            const [rows, fields] = await connection.execute(
-                'INSERT INTO users (email , password , username) VALUES (? , ? ,?)',[email,hashPass,username]
-               );
-             return rows; //trả về hàng dữ liệu
+           await db.User.create({
+                username:username,
+                email:email,
+                password:hashPass
+            })
         }
         catch(error)
         {
@@ -40,87 +35,43 @@ const createNewUser = async (email , password , username)=>{
 
 const getUserList = async() => {
 
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: bluebird,
-      });
-
-
-    try {
-        const [rows, fields] = await connection.execute(
-            'SELECT * from users'
-           );
-         return rows; //trả về hàng dữ liệu
-    }
-    catch(error)
-    {
-        console.log(error);
-    }
+   
+    let users =[];
+    users = await db.User.findAll();
+    return users;
 }
 
-const deleteUser = async (id) =>
+const deleteUser = async (userId) =>
 {
-    
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: bluebird,
-      });
-
-        try {
-            const [rows, fields] = await connection.execute(
-                'DELETE FROM users WHERE id = ?',[id]
-               );
-             return rows; //trả về hàng dữ liệu
-        }
-        catch(error)
-        {
-            console.log(error);
-        }
+    await db.User.destroy({
+        where:{id:userId}
+    })
+   
 }
-    const getUserById = async (id) =>
-    {
-        const connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            database: 'jwt',
-            Promise: bluebird,
-          });
+const getUserById = async (id) =>
+{
+        let user = {};
+        user = await db.User.findOne ({
+            where: {id:id}
+        })
+        return user;
     
-            try {
-                const [rows, fields] = await connection.execute(
-                    'SELECT * FROM users WHERE id = ?',[id]
-                   );
-                 return rows; //trả về hàng dữ liệu
-            }
-            catch(error)
-            {
-                console.log(error);
-            }
+         
 
-    }
+ }
 
-    const updateUserInfor = async (email ,username ,id)=> {
-    const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'jwt',
-    Promise: bluebird,
-  });
-
-    try {
-        const [rows, fields] = await connection.execute(
-            'UPDATE users SET email = ? , username = ? WHERE id = ?',[email,username ,id]
-           );
-         return rows; //trả về hàng dữ liệu
-    }
-    catch(error)
-    {
-        console.log(error);
-    }
+const updateUserInfor = async (email ,username ,id)=> {
+    await db.User.update(
+        { email: email ,
+          username:username
+        },
+        {
+          where: {
+            id: id
+          },
+        },
+      );
+  
     }
 
 

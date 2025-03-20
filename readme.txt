@@ -30,6 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 npm install --save-exact bluebird@3.7.2
 
 +Sequelize : viết ORM với nodejs + dùng chung với CLI
+--> file migrations để tạo database , models để code -----------------------------------------------
 LINK THAM KHẢO https://sequelize.org/docs/v6/other-topics/migrations/
 npm install --save-exact sequelize@6.13.0 sequelize-cli@6.3.0
 config : tạo .sequelizerc  rồi thêm 
@@ -38,9 +39,9 @@ config : tạo .sequelizerc  rồi thêm
 
 module.exports = {
   'config': path.resolve('./src/config', 'config.json'),
-  'migrations-path': path.resolve('./src/migrations', 'migrations'),
-  'models-path': path.resolve('./src/models', 'models'),
-  'seeders-path': path.resolve('./src/seeders', 'seeders')
+  'migrations-path': path.resolve('./src/', 'migrations'),
+  'models-path': path.resolve('./src/', 'models'),
+  'seeders-path': path.resolve('./src/', 'seeders')
 }
 
  dùng $ node_modules/.bin/sequelize init trong GIT BASH 
@@ -49,4 +50,4 @@ module.exports = {
 Create first seed: npx sequelize-cli seed:generate --name demo-user
 Run Seed:npx sequelize-cli db:seed:all
 
-    
+
