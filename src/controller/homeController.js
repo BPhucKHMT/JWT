@@ -8,7 +8,7 @@ const handleUserPage =  async (req , res) =>
 {
     //model => get data from database
     let userList = await  userService.getUserList(); // lấy list dữ liệu từ data base
-    await userService.deleteUser(3);
+    //await userService.deleteUser(3);
     return res.render("user.ejs" ,{userList});
 }
 

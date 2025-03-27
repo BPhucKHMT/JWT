@@ -34,8 +34,31 @@ const createNewUser = async (email , password , username)=>{
 }
 
 const getUserList = async() => {
+    //test user list
+    let newUser = await db.User.findOne({
+        where: {id:1},
+        attributes: ["id" , "username" ,"email"],
+        include: {model:db.Group , attributes:["name" , "description"] },
+        raw :true,
+        nest:true // cùng tên thì gộp thành 1 object
+    })
 
-   
+    // let roles =  await db.Group.findOne({
+    //     where:{id:1},
+    //     include: {model:db.Role},
+    //     raw:true,
+    //     nest:true
+    // })
+
+    let r =await db.Role.findAll({
+        include: {model:db.Group , where: {id:1}},
+        raw:true,
+        nest:true
+    })
+    console.log("check user" , newUser)
+    console.log("check roles" , r)
+
+
     let users =[];
     users = await db.User.findAll();
     return users;

@@ -1,12 +1,17 @@
 import express from "express";
 import configViewEngine from "./config/viewEngine.js";
 import initWebRoutes from "./routes/web.js";
-import bodyParser from 'body-parser'
+import bodyParser from "body-parser";
+import initApiRoutes from "./routes/api.js";
+import configCors from "./config/cors.js";
 require("dotenv").config();
-
 import connection from "./config/connectDB.js";
 
 const app = express();
+const PORT = process.env.PORT || 8080;
+
+//config Cors : cho phép front end call api
+configCors(app);
 
 //config view engine
 configViewEngine(app);
@@ -20,9 +25,8 @@ connection();
 
 //init web routes
 initWebRoutes(app);
+initApiRoutes(app);
 
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, ()=>{
-    console.log(">>> JWT Backend is running on the port =" + PORT)
+app.listen(PORT, () => {
+  console.log(">>> JWT Backend is running on the port =" + PORT);
 });
