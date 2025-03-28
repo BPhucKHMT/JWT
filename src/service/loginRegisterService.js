@@ -1,5 +1,6 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs"; // mã hóa mật khẩu
+import { Op } from 'sequelize'; //import toán tử OR
 const salt = bcrypt.genSaltSync(10); // tham số mã hóa mật khẩu
 
 const hashUserPassword = (userPassword) => {
@@ -73,6 +74,50 @@ const registerNewUser = async (rawUserData) => {
   }
 };
 
+const checkPassword = (inputPassword , hashPassword) =>{
+  return bcrypt.compareSync(inputPassword , hashPassword); //true or false
+}
+
+const handleUserLogin = async (rawData) =>{
+  try {
+    
+    let user =  await db.User.findOne({
+       where: {
+            [Op.or]: [
+                { email: rawData.valueLogin},
+                { phone: rawData.valueLogin }
+            ]
+        }
+    })
+
+    if (user) {
+      console.log("found user with email/phone")
+      let isCorrectPassword = checkPassword(rawData.password, user.password);
+      if (isCorrectPassword === true) {
+        return {
+          EM: "ok!",
+          EC: 0,
+          DT: "",
+        };
+      }
+    }
+    console.log("Input user with email/phone", rawData.valueLogin ,"password ",rawData.password );
+    return {
+      EM: "Your email/phone or password is incorrect!",
+      EC: 1,
+      DT: "",
+    };
+    
+
+  } catch (error) {
+    console.log(error)
+    return {
+      EM: "Something wrongs in service...",
+      EC: -2,
+    };
+  }
+}
+
 module.exports = {
-  registerNewUser,
+  registerNewUser,handleUserLogin
 };
